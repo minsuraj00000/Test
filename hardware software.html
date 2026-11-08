@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>QuizMaster</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed 45%, #db2777);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #1e1b2e;
+  }
+  .app {
+    width: 100%;
+    max-width: 560px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    overflow: hidden;
+    min-height: 520px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .screen { display:none; flex-direction:column; flex:1; padding: 32px 28px; animation: fadeIn 0.35s ease; overflow-y:auto; }
+  .screen.active { display:flex; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  /* HOME */
+  #home { align-items:center; justify-content:center; text-align:center; }
+  #home h1 { font-size: 32px; background: linear-gradient(135deg,#7c3aed,#db2777); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom: 6px; }
+  #home h2 { font-size: 17px; color:#4b5563; font-weight:600; margin-bottom: 22px; }
+  #home p { color:#6b7280; font-size:14px; margin-bottom: 26px; }
+  .btn {
+    background: linear-gradient(135deg,#7c3aed,#4f46e5);
+    color:white; border:none; padding: 13px 26px; border-radius: 12px;
+    font-size: 15px; font-weight:600; cursor:pointer; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 6px 16px rgba(124,58,237,0.35);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(124,58,237,0.45); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn.secondary { background:#f3f4f6; color:#374151; box-shadow:none; margin-top:10px; }
+  .btn.secondary:hover { background:#e5e7eb; transform:none; }
+  .btn.small { padding: 9px 18px; font-size: 13px; }
+  .btn.submit { background: linear-gradient(135deg,#16a34a,#22c55e); }
+  .btn-row { display:flex; gap:10px; margin-top:6px; }
+  .stat { font-size:13px; color:#9ca3af; margin-top:18px; }
+
+  /* QUIZ */
+  #quiz .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  #quiz .qcount { font-size:13px; color:#6b7280; font-weight:600; }
+  #quiz .timerText { font-size:13px; color:#db2777; font-weight:700; }
+  .progress-track { height:6px; background:#e5e7eb; border-radius:6px; overflow:hidden; margin-bottom:8px; }
+  .progress-fill { height:100%; background: linear-gradient(90deg,#7c3aed,#db2777); transition: width 0.3s; }
+  .timer-track { height:5px; background:#f3f4f6; border-radius:6px; overflow:hidden; margin-bottom:22px; }
+  .timer-fill { height:100%; background:#f59e0b; transition: width 0.2s linear; }
+  #quiz .qtext { font-size: 19px; font-weight:700; color:#1f2937; margin-bottom: 20px; line-height:1.4; }
+  .options { display:flex; flex-direction:column; gap:10px; flex:1; }
+  .opt {
+    text-align:left; padding: 13px 16px; border-radius: 12px; border: 2px solid #e5e7eb;
+    background:#fafafa; font-size:14.5px; color:#374151; cursor:pointer; transition: all 0.15s;
+  }
+  .opt:hover { border-color:#c4b5fd; background:#f5f3ff; }
+  .opt.selected { border-color:#7c3aed; background:#f5f3ff; color:#5b21b6; font-weight:600; }
+  .opt.correct { border-color:#22c55e; background:#dcfce7; color:#166534; font-weight:600; }
+  .opt.wrong { border-color:#ef4444; background:#fee2e2; color:#991b1b; font-weight:600; }
+  .navrow { display:flex; justify-content:space-between; gap:10px; margin-top:18px; }
+  .navrow .btn { flex:1; }
+
+  /* RESULT */
+  #result { align-items:center; justify-content:center; text-align:center; }
+  .ring { width:140px; height:140px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background: conic-gradient(#7c3aed calc(var(--pct)*1%), #e5e7eb 0); margin-bottom:20px; }
+  .ring-inner { width:112px; height:112px; border-radius:50%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring-inner b { font-size:26px; color:#1f2937; }
+  .ring-inner span { font-size:11px; color:#9ca3af; }
+  #result h2 { font-size:22px; color:#1f2937; margin-bottom:4px; }
+  #result p { color:#6b7280; font-size:14px; margin-bottom: 22px; }
+
+  /* REVIEW */
+  #review .rev-item { border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+  #review .rev-q { font-size:13.5px; font-weight:600; color:#1f2937; margin-bottom:6px; }
+  #review .rev-a { font-size:12.5px; margin-bottom:2px; }
+  #review .rev-a.ok { color:#16a34a; }
+  #review .rev-a.bad { color:#dc2626; }
+  #review .scroll { overflow-y:auto; flex:1; padding-right:4px; }
+  #review .scroll::-webkit-scrollbar { width:5px; }
+  #review .scroll::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:4px; }
+
+  /* ===== RESPONSIVE: small phones ===== */
+  @media (max-width: 420px) {
+    body { padding: 14px; }
+    .app {
+      max-width: 100%;
+      min-height: 0;
+      max-height: 92vh;
+      max-height: 92dvh;
+      border-radius: 18px;
+    }
+    .screen { padding: 22px 18px; }
+    #home h1 { font-size: 26px; }
+    #home h2 { font-size: 16px; margin-bottom: 4px; }
+    .btn { padding: 12px 20px; font-size: 14px; }
+    #quiz .qtext { font-size: 16.5px; margin-bottom: 14px; }
+    .opt { padding: 11px 13px; font-size: 13.5px; }
+    .ring { width: 110px; height: 110px; }
+    .ring-inner { width: 88px; height: 88px; }
+    .ring-inner b { font-size: 21px; }
+    #result h2 { font-size: 19px; }
+    .navrow { gap: 8px; }
+    .navrow .btn { padding: 11px 10px; font-size: 13px; }
+  }
+
+  /* ===== RESPONSIVE: larger desktop screens ===== */
+  @media (min-width: 900px) {
+    .app { max-width: 620px; }
+    #quiz .qtext { font-size: 21px; }
+    .opt { padding: 15px 18px; font-size: 15.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME -->
+  <div id="home" class="screen active">
+    <h1>🧠 Hi-Tech Computer </h1>
+    <h2>Hardware-Software</h2>
+    <button class="btn" id="startBtn">Start Test</button>
+    <p class="stat">50 questions • 50 min total</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="screen">
+    <div class="topbar">
+      <span class="qcount" id="qCount">Question 1/5</span>
+      <span class="timerText" id="timerText">05:00</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+    <div class="qtext" id="qText"></div>
+    <div class="options" id="optionsBox"></div>
+    <div class="navrow">
+      <button class="btn secondary" id="prevBtn">← Previous</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </div>
+    <button class="btn submit" id="submitBtn" style="margin-top:10px;">Submit Test</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="screen">
+    <div class="ring" id="ring"><div class="ring-inner"><b id="scoreBig"></b><span>SCORE</span></div></div>
+    <h2 id="resultTitle"></h2>
+    <p id="resultSub"></p>
+    <button class="btn" id="reviewBtn">Review Answers</button>
+  </div>
+
+  <!-- REVIEW -->
+  <div id="review" class="screen">
+    <h3 style="font-size:15px; color:#1f2937; margin-bottom:12px;">Answer Review</h3>
+    <div class="scroll" id="reviewList"></div>
+    <button class="btn secondary" id="backFromReview">Back to Result</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  { q:"1. Memory एक___________ है –", opts:["Program","Data","Hardware","Machine"], correct:2 },
+  { q:"2. Computer में Software कहाँ रहते है –", opts:["CPU मे","Memory मे","Program मे","Monitor मे"], correct:1 },
+  { q:"3. Software जो Hardware को control करते है –", opts:["System s/w","Application s/w","Antivirus","None"], correct:0 },
+  { q:"4. Main memory कहा जाता है –", opts:["HDD","Primary memory को","Secondary memory को","ROM को"], correct:1 },
+  { q:"5. Computer में user अपने सभी कार्य ___________ के द्वारा ही करता है", opts:["Utility s/w","Application s/w","Operating System s/w","System s/w"], correct:1 },
+  { q:"6. Permanent (स्थाई) memory नहीं है", opts:["ROM","HDD","RAM","PROM"], correct:2 },
+  { q:"7. user द्वारा दिए गए input/data को computer सर्वप्रथम किस memory मे स्टोर करता है ?", opts:["Primary memory","Secondary","a तथा b दोनों","None"], correct:0 },
+  { q:"8. Computer में data की सबसे छोटी Unit (इकाई) है –", opts:["Byte","Bit","Bit","MB"], correct:1 },
+  { q:"9. Antivirus एक _________ है –", opts:["Application s/w","Utility s/w","User program","None"], correct:1 },
+  { q:"10. Computer hardware user के द्वारा दिए गए ___________ के अनुसार कार्य करता है", opts:["Command","Electricity","Program","None"], correct:0 },
+  { q:"11. Computer program का कार्य है –", opts:["Data के store करना।","data को processing करना","Information को processing करना","Processor को fast करता है"], correct:1 },
+  { q:"12. Storage device कहा जाता है –", opts:["Primary memory","Main memory","Secondary memory","RAM"], correct:2 },
+  { q:"13. Secondary memory है –", opts:["PROM","EEPROM","External HDD","RAM"], correct:2 },
+  { q:"14. File की primary को Secondary memory में किस command से भेजा जाता है –", opts:["move","Save","cut – copy","Select"], correct:1 },
+  { q:"15. Computer में शब्दों की लंबाई ________ मे मापी जाती है –", opts:["Bit","Nibble","Byte","Kilo Byte"], correct:0 },
+  { q:"16. इनमे से कोन volatile memory है –", opts:["SSD","HDD","RAM","ROM"], correct:2 },
+  { q:"17. ? KB = 1 Mega Byte –", opts:["512","1024","8","1024 x 1024"], correct:1 },
+  { q:"18. Computer में primary memory को –", opts:["खाली रखा जाता है","पूरा Full रख जाता है","पूरा Full नहीं किया जाता है","HDD कहा जाता है"], correct:2 },
+  { q:"19. Computer में कौन Application s/w को manage करता है –", opts:["Operating System","Utility s/w","User","Processor"], correct:0 },
+  { q:"20. कौन Command नहीं है –", opts:["Print","Ctrl+c","Ctrl","Delete"], correct:2 },
+  { q:"21. Main memory (Primary memory) मे रहता है –", opts:["केवल Data","केवल Program है","केवल output","उपयुक्त सभी"], correct:3 },
+  { q:"22. Non-volatile storage है –", opts:["HDD","Memory Card","SSD","सभी"], correct:3 },
+  { q:"23. User के लिए उपयोगी नहीं है –", opts:["MS Word","Media player","Windows 11","Google Chrome"], correct:2 },
+  { q:"24. Memory में Data/Information _________ के रूप मे store रहता है –", opts:["Electricity","0-1","Program","Command"], correct:1 },
+  { q:"25. System s/w नहीं है –", opts:["UNIX","Windows 10","Mac OS","PDF Reader"], correct:3 },
+  { q:"26. कौन – सा कथन सत्य है", opts:["Excel में formula का उपयोग नहीं होता है।","Primary memory, Non-volatile memory है।","Secondary memory, आपेक्षाकृत धीरे कार्य करता है","Hardcopy को memory मे store किया जाता है"], correct:2 },
+  { q:"27. LINUX एक ______ है", opts:["Application","Hardware","Operating System","Command"], correct:2 },
+  { q:"28. Operating system s/w __________ को प्रभावित करता है।", opts:["User","Program","Computer hardware","command"], correct:2 },
+  { q:"29. SSD एक _________ memory है –", opts:["Primary","Temporary","Cache","Secondary"], correct:3 },
+  { q:"30. सत्य कथन है", opts:["Primary Memory > Secondary memory","Primary memory > Main memory","Secondary memory > Main memory","Primary memory = Secondary memory"], correct:2 },
+    { q:"31. Hardware किसे कहते है?", opts:["Computer के भौतिक (Physical) भाग","Computer के निर्देश","Data की Files","Internet Connection"], correct:0 },
+  { q:"32. Input device का उदाहरण कौन-सा है?", opts:["Monitor","Printer","Keyboard","Speaker"], correct:2 },
+  { q:"33. Output device का उदाहरण कौन-सा है?", opts:["Mouse","Scanner","Keyboard","Printer"], correct:3 },
+  { q:"34. CPU का पूरा नाम क्या है?", opts:["Central Processing Unit","Central Program Unit","Computer Processing Unit","Control Processing Unit"], correct:0 },
+  { q:"35. CPU को Computer का ______ कहा जाता है।", opts:["Heart","Brain","Eye","Hand"], correct:1 },
+  { q:"36. Motherboard का मुख्य कार्य क्या है?", opts:["Data Print करना","सभी Hardware Components को जोड़ना","Internet चलाना","Sound उत्पन्न करना"], correct:1 },
+  { q:"37. BIOS का पूरा नाम क्या है?", opts:["Basic Input Output System","Binary Input Output Software","Basic Internal Operating System","Basic Input Operating Software"], correct:0 },
+  { q:"38. Computer चालू (Start) होने की प्रक्रिया को क्या कहते है?", opts:["Formatting","Booting","Saving","Compiling"], correct:1 },
+  { q:"39. Compiler का कार्य क्या है?", opts:["High-level Language को पूरा Machine Code में एक साथ बदलना","केवल Print करना","केवल Data Store करना","Virus हटाना"], correct:0 },
+  { q:"40. Interpreter, Compiler से किस बात में अलग है?", opts:["यह Program को Line-by-Line Execute करता है","यह Hardware है","यह केवल Image खोलता है","यह Antivirus का कार्य करता है"], correct:0 },
+  { q:"41. Firmware क्या है?", opts:["Hardware में स्थायी रूप से Store किया गया Software","एक प्रकार का Virus","एक Input Device","एक Printer का नाम"], correct:0 },
+  { q:"42. Cache Memory का उपयोग किसलिए किया जाता है?", opts:["Data को स्थायी रूप से Store करने के लिए","CPU की गति को तेज़ करने के लिए","Printer चलाने के लिए","Internet Connect करने के लिए"], correct:1 },
+  { q:"43. Register सामान्यतः कहाँ स्थित होते है?", opts:["Hard Disk में","CPU के अंदर","Monitor में","Keyboard में"], correct:1 },
+  { q:"44. Freeware Software की विशेषता क्या है?", opts:["यह हमेशा Open Source होता है","यह मुफ्त में उपयोग किया जा सकता है","इसे केवल Company खरीद सकती है","यह केवल Hardware के साथ आता है"], correct:1 },
+  { q:"45. Open Source Software का एक उदाहरण कौन-सा है?", opts:["MS Windows","Linux","MS Office","Adobe Photoshop"], correct:1 },
+  { q:"46. Device Driver का मुख्य कार्य क्या है?", opts:["Hardware को Operating System से Communicate कराना","Data Print करना","Internet चलाना","File Delete करना"], correct:0 },
+  { q:"47. Scanner किस प्रकार का Device है?", opts:["Output Device","Storage Device","Input Device","Processing Device"], correct:2 },
+  { q:"48. Printer किस प्रकार का Device है?", opts:["Input Device","Output Device","Storage Device","Processing Device"], correct:1 },
+  { q:"49. GUI का पूरा नाम क्या है?", opts:["General User Interface","Graphical User Interface","Global User Interface","Graphic Unit Interface"], correct:1 },
+  { q:"50. Computer में Port का उपयोग किसलिए किया जाता है?", opts:["External Device को Connect करने के लिए","Data Delete करने के लिए","Software Install करने के लिए","Screen Brightness बढ़ाने के लिए"], correct:0 },
+];
+
+const TOTAL_TIME = 3000; // total test time in seconds
+let current = 0, selected = [], timerInterval, timeLeft;
+
+function $(id){ return document.getElementById(id); }
+const screens = { home:$('home'), quiz:$('quiz'), result:$('result'), review:$('review') };
+function show(name){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+/* ---------- QUIZ FLOW ---------- */
+$('startBtn').addEventListener('click', startQuiz);
+
+function startQuiz(){
+  current = 0;
+  selected = new Array(questions.length).fill(-1);
+  timeLeft = TOTAL_TIME;
+  show('quiz');
+  renderQuestion();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft -= 0.2;
+    updateTimerDisplay();
+    if (timeLeft <= 0){ clearInterval(timerInterval); finishQuiz(); }
+  }, 200);
+}
+
+function updateTimerDisplay(){
+  const t = Math.max(0, timeLeft);
+  const mm = String(Math.floor(t/60)).padStart(2,'0');
+  const ss = String(Math.floor(t%60)).padStart(2,'0');
+  $('timerText').textContent = `${mm}:${ss}`;
+  $('timerFill').style.width = (t/TOTAL_TIME*100) + '%';
+}
+
+function renderQuestion(){
+  const item = questions[current];
+  $('qCount').textContent = `Question ${current+1}/${questions.length}`;
+  $('progressFill').style.width = ((current)/(questions.length-1 || 1)*100) + '%';
+  $('qText').textContent = item.q;
+
+  const box = $('optionsBox');
+  box.innerHTML = '';
+  item.opts.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt' + (selected[current] === i ? ' selected' : '');
+    b.textContent = opt;
+    b.addEventListener('click', () => {
+      selected[current] = i;
+      renderQuestion();
+    });
+    box.appendChild(b);
+  });
+
+  $('prevBtn').disabled = current === 0;
+  $('nextBtn').textContent = current === questions.length - 1 ? 'Next →' : 'Next →';
+  $('nextBtn').disabled = current === questions.length - 1;
+}
+
+$('prevBtn').addEventListener('click', () => { if (current > 0){ current--; renderQuestion(); } });
+$('nextBtn').addEventListener('click', () => { if (current < questions.length-1){ current++; renderQuestion(); } });
+$('submitBtn').addEventListener('click', () => {
+  showConfirm('Submit the test now? You won\'t be able to change answers after this.', finishQuiz);
+});
+
+function showConfirm(message, onYes){
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:999; padding:20px;';
+  overlay.innerHTML = `
+    <div style="background:white; border-radius:16px; padding:24px; max-width:340px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,0.3); text-align:center;">
+      <p style="font-size:14.5px; color:#1f2937; margin-bottom:18px; line-height:1.5;">${message}</p>
+      <div style="display:flex; gap:10px;">
+        <button id="confirmNo" class="btn secondary" style="flex:1;">Cancel</button>
+        <button id="confirmYes" class="btn submit" style="flex:1;">Submit</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirmNo').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#confirmYes').addEventListener('click', () => { overlay.remove(); onYes(); });
+}
+
+function finishQuiz(){
+  clearInterval(timerInterval);
+  let score = 0;
+  questions.forEach((item, i) => { if (selected[i] === item.correct) score++; });
+  window._lastScore = score;
+
+  const pct = Math.round((score/questions.length)*100);
+  $('ring').style.setProperty('--pct', pct);
+  $('scoreBig').textContent = `${score}/${questions.length}`;
+  $('resultTitle').textContent = pct >= 80 ? 'Excellent! 🎉' : pct >= 50 ? 'Good Job! 👍' : 'Keep Practicing 💪';
+  $('resultSub').textContent = `You scored ${pct}% on this quiz.`;
+  show('result');
+}
+
+$('reviewBtn').addEventListener('click', () => {
+  const list = $('reviewList');
+  list.innerHTML = '';
+  questions.forEach((item, i) => {
+    const chosen = selected[i];
+    const ok = chosen === item.correct;
+    const chosenText = chosen >= 0 ? item.opts[chosen] : '(not answered)';
+    const div = document.createElement('div');
+    div.className = 'rev-item';
+    div.innerHTML = `
+      <div class="rev-q">${i+1}. ${item.q}</div>
+      <div class="rev-a ${ok ? 'ok' : 'bad'}">Your answer: ${chosenText}</div>
+      ${ok ? '' : `<div class="rev-a ok">Correct answer: ${item.opts[item.correct]}</div>`}
+    `;
+    list.appendChild(div);
+  });
+  show('review');
+});
+$('backFromReview').addEventListener('click', () => show('result'));
+</script>
+</body>
+</html>

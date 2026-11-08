@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hi-Tech Computer Academy - Kochas</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#171A2B;
+    --ink-soft:#585C74;
+    --line:#E2E4EF;
+    --card:#FFFFFF;
+    --grad-a:#4f46e5;
+    --grad-b:#7c3aed;
+    --grad-c:#db2777;
+    --grad: linear-gradient(135deg, var(--grad-a), var(--grad-b) 45%, var(--grad-c));
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--grad);
+    background-attachment:fixed;
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:'Space Grotesk', sans-serif;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{text-decoration:none;color:inherit;}
+
+  /* ---------- NAVBAR ---------- */
+  header{
+    position:sticky; top:0; z-index:50;
+    background:rgba(255,255,255,0.12);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid rgba(255,255,255,0.18);
+  }
+  .nav-wrap{
+    max-width:1180px; margin:0 auto;
+    display:flex; align-items:center; justify-content:space-between;
+    padding:16px 24px;
+  }
+  .logo{
+    font-family:'Space Grotesk', sans-serif;
+    font-weight:700; font-size:22px; letter-spacing:0.5px;
+    display:flex; align-items:center; gap:8px;
+    color:#fff;
+  }
+  .logo .dot{
+    width:8px;height:8px;border-radius:50%;
+    background:#fff;
+  }
+  nav.links{
+    display:flex; align-items:center; gap:32px;
+  }
+  nav.links a{
+    font-size:15px; font-weight:500; color:rgba(255,255,255,0.85);
+    transition:color .2s;
+  }
+  nav.links a:hover{color:#fff;}
+  .nav-actions{display:flex; align-items:center; gap:12px;}
+  .btn{
+    padding:9px 20px; border-radius:8px; font-size:14px; font-weight:600;
+    border:1px solid rgba(255,255,255,0.35); cursor:pointer;
+  }
+  .btn-ghost{background:transparent; color:#fff;}
+  .btn-ghost:hover{border-color:#fff; background:rgba(255,255,255,0.1);}
+  .btn-grad{
+    background:#fff; color:var(--grad-b); border:none;
+  }
+  .btn-grad:hover{filter:brightness(1.05);}
+
+  .burger{
+    display:none; flex-direction:column; gap:5px;
+    background:none; border:none; cursor:pointer; padding:6px;
+  }
+  .burger span{
+    width:24px; height:2px; background:#fff; border-radius:2px;
+    transition:transform .25s, opacity .25s;
+  }
+  .mobile-menu{
+    display:none;
+    flex-direction:column;
+    gap:4px;
+    padding:12px 24px 20px;
+    border-top:1px solid rgba(255,255,255,0.18);
+  }
+  .mobile-menu a, .mobile-menu button{
+    padding:12px 4px; font-size:15px; font-weight:500;
+    border-bottom:1px solid rgba(255,255,255,0.18); text-align:left; background:none; border-left:none; border-right:none; border-top:none;
+    color:#fff;
+  }
+  .mobile-menu .mm-actions{display:flex; gap:10px; margin-top:10px;}
+  .mobile-menu .mm-actions .btn{flex:1; border-bottom:none;}
+
+  @media (max-width:860px){
+    nav.links, .nav-actions{display:none;}
+    .burger{display:flex;}
+    header.open .mobile-menu{display:flex;}
+  }
+
+  /* ---------- HERO ---------- */
+  .hero{
+    position:relative;
+    padding:88px 24px 64px;
+    text-align:center;
+  }
+  .hero-inner{position:relative; max-width:760px; margin:0 auto;}
+  .hero h1{
+    font-size:clamp(32px, 5vw, 52px);
+    line-height:1.12;
+    font-weight:700;
+    letter-spacing:-0.5px;
+    color:#fff;
+  }
+  .hero-cta{
+    margin-top:34px;
+    display:flex; gap:14px; justify-content:center; flex-wrap:wrap;
+  }
+  .hero-cta .btn{padding:13px 28px; font-size:15px; border-radius:10px;}
+
+  /* ---------- LATEST TEST ---------- */
+  .section{
+    max-width:1080px; margin:0 auto;
+    padding:20px 24px 90px;
+  }
+  .section-head{
+    display:flex; align-items:flex-end; justify-content:space-between;
+    margin-bottom:26px; flex-wrap:wrap; gap:14px;
+  }
+  .section-head h2{
+    font-size:26px; font-weight:700;
+    color:#fff;
+  }
+  .section-head .topics-label{
+    display:block;
+    font-family:'JetBrains Mono', monospace;
+    font-size:13px; color:rgba(255,255,255,0.75);
+    margin-top:6px;
+  }
+  .see-all{
+    display:flex; align-items:center; gap:10px;
+  }
+  .see-all span{
+    font-size:14px; font-weight:600; color:#fff;
+  }
+  .round-btn{
+    width:38px; height:38px; border-radius:50%;
+    background:#fff; border:none; cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    color:#000;
+    transition:transform .2s;
+  }
+  .round-btn:hover{transform:translateX(2px);}
+  .round-btn svg{width:16px; height:16px;}
+  .test-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
+    gap:18px;
+  }
+  .test-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:24px;
+    display:flex; flex-direction:column; gap:16px;
+    transition:transform .2s, box-shadow .2s;
+  }
+  .test-card:hover{
+    transform:translateY(-3px);
+    box-shadow:0 12px 28px -14px rgba(23,20,60,0.18);
+  }
+  .test-card .meta{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; color:var(--ink-soft);
+  }
+  .test-card h3{font-size:18px; font-weight:600;}
+  .topic-btn{
+    align-self:flex-start;
+    padding:10px 20px;
+    border-radius:8px;
+    font-size:14px; font-weight:600;
+    color:#fff;
+    background:var(--grad);
+    border:none; cursor:pointer;
+  }
+  .topic-btn:hover{filter:brightness(1.08);}
+
+  footer{
+    text-align:center; padding:26px 20px;
+    color:rgba(255,255,255,0.75); font-size:13px;
+    border-top:1px solid rgba(255,255,255,0.18);
+  }
+
+  :focus-visible{outline:2px solid var(--grad-a); outline-offset:2px;}
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header id="siteHeader">
+  <div class="nav-wrap">
+    <div class="logo"><span class="dot"></span>test</div>
+
+    <nav class="links">
+      <a href="#home">Home</a>
+      <a href="#quiz">Quiz</a>
+      <a href="#about">About Us</a>
+      <a href="#contact">Contact Us</a>
+    </nav>
+
+    <div class="nav-actions">
+      <a href="#login" class="btn btn-ghost">Login</a>
+      <a href="#signup" class="btn btn-grad">Sign Up</a>
+    </div>
+
+    <button class="burger" id="burgerBtn" aria-label="Menu toggle" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+
+  <div class="mobile-menu" id="mobileMenu">
+    <a href="#home">Home</a>
+    <a href="#quiz">Quiz</a>
+    <a href="#about">About Us</a>
+    <a href="#contact">Contact Us</a>
+    <div class="mm-actions">
+      <a href="#login" class="btn btn-ghost">Login</a>
+      <a href="#signup" class="btn btn-grad">Sign Up</a>
+    </div>
+  </div>
+</header>
+
+<section class="hero" id="home">
+  <div class="hero-inner">
+    <h1>Hi-Tech Computer Academy Kochas</h1>
+    <div class="hero-cta">
+      <a href="all test.html" class="btn btn-grad">Start Test</a>
+    </div>
+  </div>
+</section>
+
+<section class="section" id="quiz">
+  <div class="section-head">
+    <div>
+      <h2>Latest Test</h2>
+      <span class="topics-label">Topics</span>
+    </div>
+    <div class="see-all">
+      <span>See all</span>
+      <a href="all test.html"><button class="round-btn" aria-label="See all topics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button></a>
+    </div>
+  </div>
+  <div class="test-card">
+      <div class="meta"></div>
+      <h3>Parts of computer</h3>
+      <a href="parts of computer.html"><button class="topic-btn">Start Test</button></a>
+    </div>
+    <br>
+    <div class="test-card">
+      <div class="meta"></div>
+      <h3>Hardware-Software</h3>
+      <a href="hardware software.html"><button class="topic-btn">Start Test</button></a>
+    </div>
+    <br>
+  <div class="test-grid">
+    <div class="test-card">
+      <div class="meta"></div>
+      <h3>Computer Network</h3>
+      <a href="computer network.html"><button class="topic-btn">Start Test</button></a>
+    </div>
+    <div class="test-card">
+      <div class="meta">COMING SOON</div>
+      <h3>MS Office</h3>
+      <button class="topic-btn">Start Test</button>
+    </div>
+  </div>
+
+  <div class="section-head">
+    <div>
+      <h2>Mix Lesson</h2>
+      <span class="topics-label">Topics</span>
+    </div>
+    <div class="see-all">
+      <span>See all</span>
+      <a href="C:\hi-tech\test\Mix Lesson/mix lesson.html"><button class="round-btn" aria-label="See all topics">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+          <polyline points="12 5 19 12 12 19"></polyline>
+        </svg>
+      </button></a>
+    </div>
+  </div>
+    <div class="test-card">
+      <div class="meta"></div>
+      <h3>Paper 1</h3>
+      <a href="Mix Lesson/paper 1.html"><button class="topic-btn">Start Test</button></a>
+    </div>
+    <br>
+    <div class="test-card">
+      <div class="meta"></div>
+      <h3>Paper 2</h3>
+      <a href="Mix Lesson/paper 2.html"><button class="topic-btn">Start Test</button></a>
+    </div>
+    <br>
+  <div class="test-grid">
+    <div class="test-card">
+      <div class="meta"></div>
+      <h3>Paper 3</h3>
+      <a href="Mix Lesson/paper 3.html"><button class="topic-btn">Start Test</button></a>
+    </div>
+    <div class="test-card">
+      <div class="meta">COMING SOON</div>
+      <h3>MS Office</h3>
+      <button class="topic-btn">Start Test</button>
+    </div>
+  </div>
+
+</section>
+
+<footer>
+    Design by Minsu Raj
+    <br>
+  © 2026 Hi-Tech Computer Academy, Kochas. All rights reserved.
+</footer>
+
+<script>
+  const header = document.getElementById('siteHeader');
+  const burger = document.getElementById('burgerBtn');
+  burger.addEventListener('click', () => {
+    const isOpen = header.classList.toggle('open');
+    burger.setAttribute('aria-expanded', isOpen);
+  });
+</script>
+
+</body>
+</html>

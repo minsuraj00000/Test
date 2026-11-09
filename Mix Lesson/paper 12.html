@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Paper 12</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed 45%, #db2777);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #1e1b2e;
+  }
+  .app {
+    width: 100%;
+    max-width: 560px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    overflow: hidden;
+    min-height: 520px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .screen { display:none; flex-direction:column; flex:1; padding: 32px 28px; animation: fadeIn 0.35s ease; overflow-y:auto; }
+  .screen.active { display:flex; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  /* HOME */
+  #home { align-items:center; justify-content:center; text-align:center; }
+  #home h1 { font-size: 32px; background: linear-gradient(135deg,#7c3aed,#db2777); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom: 6px; }
+  #home h2 { font-size: 17px; color:#4b5563; font-weight:600; margin-bottom: 22px; }
+  #home p { color:#6b7280; font-size:14px; margin-bottom: 26px; }
+  .btn {
+    background: linear-gradient(135deg,#7c3aed,#4f46e5);
+    color:white; border:none; padding: 13px 26px; border-radius: 12px;
+    font-size: 15px; font-weight:600; cursor:pointer; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 6px 16px rgba(124,58,237,0.35);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(124,58,237,0.45); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn.secondary { background:#f3f4f6; color:#374151; box-shadow:none; margin-top:10px; }
+  .btn.secondary:hover { background:#e5e7eb; transform:none; }
+  .btn.small { padding: 9px 18px; font-size: 13px; }
+  .btn.submit { background: linear-gradient(135deg,#16a34a,#22c55e); }
+  .btn-row { display:flex; gap:10px; margin-top:6px; }
+  .stat { font-size:13px; color:#9ca3af; margin-top:18px; }
+
+  /* QUIZ */
+  #quiz .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  #quiz .qcount { font-size:13px; color:#6b7280; font-weight:600; }
+  #quiz .timerText { font-size:13px; color:#db2777; font-weight:700; }
+  .progress-track { height:6px; background:#e5e7eb; border-radius:6px; overflow:hidden; margin-bottom:8px; }
+  .progress-fill { height:100%; background: linear-gradient(90deg,#7c3aed,#db2777); transition: width 0.3s; }
+  .timer-track { height:5px; background:#f3f4f6; border-radius:6px; overflow:hidden; margin-bottom:22px; }
+  .timer-fill { height:100%; background:#f59e0b; transition: width 0.2s linear; }
+  #quiz .qtext { font-size: 19px; font-weight:700; color:#1f2937; margin-bottom: 20px; line-height:1.4; }
+  .options { display:flex; flex-direction:column; gap:10px; flex:1; }
+  .opt {
+    text-align:left; padding: 13px 16px; border-radius: 12px; border: 2px solid #e5e7eb;
+    background:#fafafa; font-size:14.5px; color:#374151; cursor:pointer; transition: all 0.15s;
+  }
+  .opt:hover { border-color:#c4b5fd; background:#f5f3ff; }
+  .opt.selected { border-color:#7c3aed; background:#f5f3ff; color:#5b21b6; font-weight:600; }
+  .opt.correct { border-color:#22c55e; background:#dcfce7; color:#166534; font-weight:600; }
+  .opt.wrong { border-color:#ef4444; background:#fee2e2; color:#991b1b; font-weight:600; }
+  .navrow { display:flex; justify-content:space-between; gap:10px; margin-top:18px; }
+  .navrow .btn { flex:1; }
+
+  /* RESULT */
+  #result { align-items:center; justify-content:center; text-align:center; }
+  .ring { width:140px; height:140px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background: conic-gradient(#7c3aed calc(var(--pct)*1%), #e5e7eb 0); margin-bottom:20px; }
+  .ring-inner { width:112px; height:112px; border-radius:50%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring-inner b { font-size:26px; color:#1f2937; }
+  .ring-inner span { font-size:11px; color:#9ca3af; }
+  #result h2 { font-size:22px; color:#1f2937; margin-bottom:4px; }
+  #result p { color:#6b7280; font-size:14px; margin-bottom: 22px; }
+
+  /* REVIEW */
+  #review .rev-item { border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+  #review .rev-q { font-size:13.5px; font-weight:600; color:#1f2937; margin-bottom:6px; }
+  #review .rev-a { font-size:12.5px; margin-bottom:2px; }
+  #review .rev-a.ok { color:#16a34a; }
+  #review .rev-a.bad { color:#dc2626; }
+  #review .scroll { overflow-y:auto; flex:1; padding-right:4px; }
+  #review .scroll::-webkit-scrollbar { width:5px; }
+  #review .scroll::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:4px; }
+
+  /* ===== RESPONSIVE: small phones ===== */
+  @media (max-width: 420px) {
+    body { padding: 14px; }
+    .app {
+      max-width: 100%;
+      min-height: 0;
+      max-height: 92vh;
+      max-height: 92dvh;
+      border-radius: 18px;
+    }
+    .screen { padding: 22px 18px; }
+    #home h1 { font-size: 26px; }
+    #home h2 { font-size: 16px; margin-bottom: 4px; }
+    .btn { padding: 12px 20px; font-size: 14px; }
+    #quiz .qtext { font-size: 16.5px; margin-bottom: 14px; }
+    .opt { padding: 11px 13px; font-size: 13.5px; }
+    .ring { width: 110px; height: 110px; }
+    .ring-inner { width: 88px; height: 88px; }
+    .ring-inner b { font-size: 21px; }
+    #result h2 { font-size: 19px; }
+    .navrow { gap: 8px; }
+    .navrow .btn { padding: 11px 10px; font-size: 13px; }
+  }
+
+  /* ===== RESPONSIVE: larger desktop screens ===== */
+  @media (min-width: 900px) {
+    .app { max-width: 620px; }
+    #quiz .qtext { font-size: 21px; }
+    .opt { padding: 15px 18px; font-size: 15.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME -->
+  <div id="home" class="screen active">
+    <h1>🧠 Hi-Tech Computer </h1>
+    <h2>Mix Lesson</h2>
+    <h3>Paper 12</h3>
+    <button class="btn" id="startBtn"style="margin-top: 10px;">Start Test</button>
+    <p class="stat">50 questions • 50 min total</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="screen">
+    <div class="topbar">
+      <span class="qcount" id="qCount">Question 1/5</span>
+      <span class="timerText" id="timerText">05:00</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+    <div class="qtext" id="qText"></div>
+    <div class="options" id="optionsBox"></div>
+    <div class="navrow">
+      <button class="btn secondary" id="prevBtn">← Previous</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </div>
+    <button class="btn submit" id="submitBtn" style="margin-top:10px;">Submit Test</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="screen">
+    <div class="ring" id="ring"><div class="ring-inner"><b id="scoreBig"></b><span>SCORE</span></div></div>
+    <h2 id="resultTitle"></h2>
+    <p id="resultSub"></p>
+    <button class="btn" id="reviewBtn">Review Answers</button>
+  </div>
+
+  <!-- REVIEW -->
+  <div id="review" class="screen">
+    <h3 style="font-size:15px; color:#1f2937; margin-bottom:12px;">Answer Review</h3>
+    <div class="scroll" id="reviewList"></div>
+    <button class="btn secondary" id="backFromReview">Back to Result</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  { q:"1. MS-Word में पेज के ऊपरी भाग में लिखावट को दोहराने के लिए किसका प्रयोग किया जाता है?", opts:["Header","Footer","Page number","Watermark"], correct:0 },
+  { q:"2. MS-Word में नया पेज बनाने के लिए किसका उपयोग करते हैं?", opts:["Cover page","Blank page","Page break","Page layout"], correct:1 },
+  { q:"3. हिंदी लिखने के लिए किस फॉन्ट को सेलेक्ट किया जाता है?", opts:["Times new roman","Elephant","Kruti dev 010","Calibri"], correct:2 },
+  { q:"4. Notepad में किस मेनू में लिखावट और आकार बदलते हैं?", opts:["Format","File","Edit","View"], correct:0 },
+  { q:"5. MS-Word में लिखावट के बड़े अक्षर को छोटे अक्षर में बदलने के लिए किसका चुनाव करते हैं?", opts:["Header","Lower case","Page number","Upper case"], correct:1 },
+  { q:"6. लिखावट को डिज़ाइन में लिखने के लिए किसका उपयोग करते हैं?", opts:["Shape","WordArt","Bullet","Watermark"], correct:1 },
+  { q:"7. MS-Word में पेज, शब्द, लाइन, अक्षर इत्यादि को कहाँ से गिनते हैं?", opts:["Research","Footnote","Spellings and grammar","Word Count"], correct:3 },
+  { q:"8. MS-Excel में Fill का उपयोग क्यों किया जाता है?", opts:["अंकों को जोड़ने के लिए","अंकों को श्रेणी क्रम में लिखने के लिए","Cell style बदलने के लिए","अंकों पर फॉर्मूला लगाने के लिए"], correct:1 },
+  { q:"9. MS-Excel में संख्याओं का गुणनफल ज्ञात करने के लिए किस फॉर्मूला उपयोग किया जाता है?", opts:["Sum","Power","Quotient","Product"], correct:3 },
+  { q:"10. MS-Word में किसके उपयोग से पेज के Background में लिखते हैं?", opts:["Page brake","Page border","Cover page","Watermark"], correct:3 },
+  { q:"11. MS-Word में Document views का क्या उपयोग है?", opts:["Document को अलग-अलग प्रकार से दिखाया जाता है","Document का print preview देखने के लिए","Page को सजाने के लिए","Zoom करने के लिए"], correct:0 },
+  { q:"12. MS-Word में कितना Tab या Menu bar होता है?", opts:["5","6","7","8"], correct:3 },
+  { q:"13. MS-Word में पेज का (Margins) चौड़ाई कहाँ से बदलते हैं?", opts:["Orientation","Columns","Margins","Themes"], correct:2 },
+  { q:"14. MS-Word में अलग-अलग प्रकार का आकृति(Shape) बनाते हैं?", opts:["SmartArt","Shapes","Object","Chart"], correct:1 },
+  { q:"15. MS-Word में Index(हेडिंग या फोटो का सूची) कहाँ से बनाते हैं?", opts:["Insert","Reference","Review","Home"], correct:1 },
+  { q:"16. एक कंप्यूटर को ON करने की प्रक्रिया कहलाती है?", opts:["स्टार्टिंग","टर्निंग ओन","बूटिंग","हयबरनेटिंग"], correct:2 },
+  { q:"17. स्क्रीन के सबसे निचले भाग पर आप जो एक लम्बा सा बार देखते है,...........कहलाता है?", opts:["टास्क बार","टाइटल बार","मेनू बार","स्पेस बार"], correct:0 },
+  { q:"18. कंप्यूटर का सबसे महत्वपूर्ण प्रोग्राम कौन-सा है?", opts:["ऑपरेटिंग सिस्टम","सॉफ्टवेयर प्रोग्राम","एप्लीकेशन प्रोग्राम","इनमे से कोई नहीं"], correct:0 },
+  { q:"19. COBOL क्या है?", opts:["कोयले की राख","कंप्यूटर भाषा","नई तोप","विशेष गेंद"], correct:1 },
+  { q:"20. कंप्यूटर में उपयोग में आने वाली आई.सी.चिप किससे बनी होती है?", opts:["सिलिकॉन","तांबा","स्टील","प्लास्टिक"], correct:0 },
+  { q:"21. Computer को Shutdown करने के लिए कीबोर्ड पर कोनसी Shortcut Key का प्रयोग करते है?", opts:["Ctrl+Delete","Ctrl+F4","Alt+F4","Alt+F5"], correct:2 },
+  { q:"22. 'थर्मोमीटर' किस प्रकार का Computer है?", opts:["सुपर","एनालॉग","डिजिटल","हाइब्रिड"], correct:1 },
+  { q:"23. www का पूर्ण रूप क्या है?", opts:["word wide web","world wire web","world wide web","none"], correct:2 },
+  { q:"24. नियमों के समूह को कहते हैं?", opts:["Computer program","Algorithm","Flowchart","Utility programs"], correct:1 },
+  { q:"25. CRT, LCD, LED TFT ……………… के प्रकार हैं?", opts:["program","Monitor","CPU","Utility programs"], correct:1 },
+  { q:"26. MS-Word में पेज के ऊपर-नीचे जगह छोड़ने को क्या कहते हैं?", opts:["Margin","Header","Footer","Spacing"], correct:0 },
+  { q:"27. MS-Word में Ctrl + I का उपयोग किस लिए होता है?", opts:["Italic","Insert","Indent","Image"], correct:0 },
+  { q:"28. MS-Excel में किसी सेल का बैकग्राउंड कलर बदलने का विकल्प कहाँ मिलता है?", opts:["Home > Fill Color","Insert > Color","Page Layout > Theme","View > Color"], correct:0 },
+  { q:"29. MS-Word में टेबल बनाने के लिए किस टैब का उपयोग करते हैं?", opts:["Home","Insert","Design","View"], correct:1 },
+  { q:"30. MS-Excel में औसत निकालने के लिए कौन सा फंक्शन उपयोग होता है?", opts:["AVERAGE","COUNT","MAX","SUM"], correct:0 },
+  { q:"31. MS-Word में पैराग्राफ को बीच में लाने के लिए कौन सी Alignment चुनते हैं?", opts:["Left","Right","Center","Justify"], correct:2 },
+  { q:"32. MS-Excel में चार्ट बनाने के लिए किस टैब का उपयोग करते हैं?", opts:["Data","Formulas","Insert","Review"], correct:2 },
+  { q:"33. MS-Word में स्पेलिंग चेक करने की shortcut key क्या है?", opts:["F1","F5","F7","F12"], correct:2 },
+  { q:"34. MS-Excel में सबसे बड़ी संख्या निकालने के लिए कौन सा फंक्शन है?", opts:["MIN","LARGE","MAX","BIG"], correct:2 },
+  { q:"35. MS-Word में लाइन के बीच की दूरी बदलने को क्या कहते हैं?", opts:["Line Spacing","Word Spacing","Paragraph Spacing","Character Spacing"], correct:0 },
+  { q:"36. MS-Excel में कॉलम और रो के मिलने वाले स्थान को क्या कहते हैं?", opts:["Cell","Box","Block","Sheet"], correct:0 },
+  { q:"37. MS-Word में पेज को Landscape करने का विकल्प कहाँ होता है?", opts:["Home > Orientation","Insert > Page","Page Layout > Orientation","View > Layout"], correct:2 },
+  { q:"38. MS-Excel में Ctrl + ; का उपयोग किस लिए होता है?", opts:["आज की तारीख डालने","वर्तमान समय डालने","सेल कॉपी करने","सेल डिलीट करने"], correct:0 },
+  { q:"39. MS-Word में टेक्स्ट के पीछे डिज़ाइन लगाने को क्या कहते हैं?", opts:["Watermark","Background","Theme","Pattern"], correct:0 },
+  { q:"40. MS-Excel में शीट का नाम बदलने के लिए क्या करते हैं?", opts:["डबल क्लिक","राइट क्लिक > Rename","Ctrl + R","Alt + N"], correct:1 },
+  { q:"41. कंप्यूटर में 'Email' का पूरा नाम क्या है?", opts:["Electronic Mail","Electric Mail","Easy Mail","None"], correct:0 },
+  { q:"42. कंप्यूटर में मॉनिटर का रिफ्रेश रेट किसमें मापा जाता है?", opts:["Hz","MB","GB","Pixel"], correct:0 },
+  { q:"43. MS-Word में Ctrl + U का उपयोग क्या है?", opts:["Underline","Uppercase","Undo","Update"], correct:0 },
+  { q:"44. MS-Excel में डेटा को आरोही क्रम में लगाने को क्या कहते हैं?", opts:["Sort A to Z","Sort Z to A","Filter","Group"], correct:0 },
+  { q:"45. MS-Word में पेज नंबर डालने का विकल्प किस टैब में होता है?", opts:["Home","Insert","Design","References"], correct:1 },
+  { q:"46. कंप्यूटर में 'LAN' का पूरा नाम क्या है?", opts:["Local Area Network","Large Area Network","Long Area Network","None"], correct:0 },
+  { q:"47. MS-Excel में #REF! error क्यों आता है?", opts:["गलत फॉर्मूला","सेल डिलीट होने पर","मेमोरी कम होने पर","नेटवर्क एरर"], correct:1 },
+  { q:"48. MS-Word में Ctrl + E का उपयोग किस लिए होता है?", opts:["Exit","Expand","Center Align","Encrypt"], correct:2 },
+  { q:"49. कंप्यूटर में 'Bluetooth' किस प्रकार का कनेक्शन है?", opts:["Wired","Wireless","Optical","Satellite"], correct:1 },
+  { q:"50. MS-Excel में वर्कशीट में कुल कितने कॉलम होते हैं?", opts:["256","1024","16384","65536"], correct:2 }
+];
+
+const TOTAL_TIME = 3000; // total test time in seconds
+let current = 0, selected = [], timerInterval, timeLeft;
+
+function $(id){ return document.getElementById(id); }
+const screens = { home:$('home'), quiz:$('quiz'), result:$('result'), review:$('review') };
+function show(name){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+/* ---------- QUIZ FLOW ---------- */
+$('startBtn').addEventListener('click', startQuiz);
+
+function startQuiz(){
+  current = 0;
+  selected = new Array(questions.length).fill(-1);
+  timeLeft = TOTAL_TIME;
+  show('quiz');
+  renderQuestion();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft -= 0.2;
+    updateTimerDisplay();
+    if (timeLeft <= 0){ clearInterval(timerInterval); finishQuiz(); }
+  }, 200);
+}
+
+function updateTimerDisplay(){
+  const t = Math.max(0, timeLeft);
+  const mm = String(Math.floor(t/60)).padStart(2,'0');
+  const ss = String(Math.floor(t%60)).padStart(2,'0');
+  $('timerText').textContent = `${mm}:${ss}`;
+  $('timerFill').style.width = (t/TOTAL_TIME*100) + '%';
+}
+
+function renderQuestion(){
+  const item = questions[current];
+  $('qCount').textContent = `Question ${current+1}/${questions.length}`;
+  $('progressFill').style.width = ((current)/(questions.length-1 || 1)*100) + '%';
+  $('qText').textContent = item.q;
+
+  const box = $('optionsBox');
+  box.innerHTML = '';
+  item.opts.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt' + (selected[current] === i ? ' selected' : '');
+    b.textContent = opt;
+    b.addEventListener('click', () => {
+      selected[current] = i;
+      renderQuestion();
+    });
+    box.appendChild(b);
+  });
+
+  $('prevBtn').disabled = current === 0;
+  $('nextBtn').textContent = current === questions.length - 1 ? 'Next →' : 'Next →';
+  $('nextBtn').disabled = current === questions.length - 1;
+}
+
+$('prevBtn').addEventListener('click', () => { if (current > 0){ current--; renderQuestion(); } });
+$('nextBtn').addEventListener('click', () => { if (current < questions.length-1){ current++; renderQuestion(); } });
+$('submitBtn').addEventListener('click', () => {
+  showConfirm('Submit the test now? You won\'t be able to change answers after this.', finishQuiz);
+});
+
+function showConfirm(message, onYes){
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:999; padding:20px;';
+  overlay.innerHTML = `
+    <div style="background:white; border-radius:16px; padding:24px; max-width:340px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,0.3); text-align:center;">
+      <p style="font-size:14.5px; color:#1f2937; margin-bottom:18px; line-height:1.5;">${message}</p>
+      <div style="display:flex; gap:10px;">
+        <button id="confirmNo" class="btn secondary" style="flex:1;">Cancel</button>
+        <button id="confirmYes" class="btn submit" style="flex:1;">Submit</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirmNo').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#confirmYes').addEventListener('click', () => { overlay.remove(); onYes(); });
+}
+
+function finishQuiz(){
+  clearInterval(timerInterval);
+  let score = 0;
+  questions.forEach((item, i) => { if (selected[i] === item.correct) score++; });
+  window._lastScore = score;
+
+  const pct = Math.round((score/questions.length)*100);
+  $('ring').style.setProperty('--pct', pct);
+  $('scoreBig').textContent = `${score}/${questions.length}`;
+  $('resultTitle').textContent = pct >= 80 ? 'Excellent! 🎉' : pct >= 50 ? 'Good Job! 👍' : 'Keep Practicing 💪';
+  $('resultSub').textContent = `You scored ${pct}% on this quiz.`;
+  show('result');
+}
+
+$('reviewBtn').addEventListener('click', () => {
+  const list = $('reviewList');
+  list.innerHTML = '';
+  questions.forEach((item, i) => {
+    const chosen = selected[i];
+    const ok = chosen === item.correct;
+    const chosenText = chosen >= 0 ? item.opts[chosen] : '(not answered)';
+    const div = document.createElement('div');
+    div.className = 'rev-item';
+    div.innerHTML = `
+      <div class="rev-q">${i+1}. ${item.q}</div>
+      <div class="rev-a ${ok ? 'ok' : 'bad'}">Your answer: ${chosenText}</div>
+      ${ok ? '' : `<div class="rev-a ok">Correct answer: ${item.opts[item.correct]}</div>`}
+    `;
+    list.appendChild(div);
+  });
+  show('review');
+});
+$('backFromReview').addEventListener('click', () => show('result'));
+</script>
+</body>
+</html>

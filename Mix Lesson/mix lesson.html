@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>All Tests</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed 45%, #db2777);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #1e1b2e;
+  }
+  .app {
+    width: 100%;
+    max-width: 560px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    overflow: hidden;
+    min-height: 520px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .screen { display:flex; flex-direction:column; flex:1; padding: 32px 28px; overflow-y:auto; animation: fadeIn 0.35s ease; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  .page-title { font-size: 26px; font-weight:800; text-align:center;
+    background: linear-gradient(135deg,#7c3aed,#db2777);
+    -webkit-background-clip:text; background-clip:text; color:transparent;
+    margin-bottom: 4px;
+  }
+  .page-sub { text-align:center; font-size:13.5px; color:#6b7280; margin-bottom: 24px; }
+
+  .test-list { display:flex; flex-direction:column; gap:14px; flex:1; }
+  .test-card {
+    border:1px solid #e5e7eb; border-radius:14px; padding:16px 18px;
+    display:flex; flex-direction:column; gap:10px;
+    transition: box-shadow 0.15s, transform 0.15s;
+  }
+  .test-card:hover { box-shadow: 0 8px 20px rgba(124,58,237,0.15); transform: translateY(-2px); }
+  .test-card .name { font-size:16px; font-weight:700; color:#1f2937; }
+  .test-card .meta { font-size:12.5px; color:#9ca3af; display:flex; gap:14px; }
+  .test-card .meta span::before { content:"• "; }
+  .test-card .meta span:first-child::before { content:""; }
+
+  .btn {
+    background: linear-gradient(135deg,#7c3aed,#4f46e5);
+    color:white; border:none; padding: 11px 22px; border-radius: 10px;
+    font-size: 14px; font-weight:600; cursor:pointer; text-decoration:none;
+    text-align:center; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 6px 16px rgba(124,58,237,0.35);
+    display:inline-block;
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(124,58,237,0.45); }
+  .btn.secondary { background:#f3f4f6; color:#374151; box-shadow:none; }
+  .btn.secondary:hover { background:#e5e7eb; transform:none; }
+
+  .back-link { margin-top: 20px; text-align:center; }
+
+  @media (max-width: 420px) {
+    body { padding: 14px; }
+    .app { max-width:100%; min-height:0; max-height:92vh; max-height:92dvh; border-radius:18px; }
+    .screen { padding: 22px 18px; }
+    .page-title { font-size: 22px; }
+    .test-card .name { font-size: 14.5px; }
+  }
+  @media (min-width: 900px) {
+    .app { max-width: 620px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="screen">
+    <h1 class="page-title">Hi-tech Compute Academy</h1>
+    <h2 style="text-align: center;">All Test </h2>
+    <h3 style="text-align: center;">Mix Lesson</h3>
+    <p class="page-sub">Choose a test to begin</p>
+
+    <div class="test-list">
+
+      <div class="test-card">
+        <div class="name">Paper 1</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>~50 min</span>
+        </div>
+        <a class="btn" href="paper 1.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 2</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 2.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 3</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 3.html">Start Test</a>
+      </div>
+      
+      <div class="test-card">
+        <div class="name">Paper 4</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 4.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 5</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 5.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 6</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 6.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 7</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 7.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 8</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 8.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 9</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 9.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 10</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 10.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 11</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 11.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 12</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 12.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 13</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 13.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 14</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 14.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 15</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 15.html">Start Test</a>
+      </div>
+
+      <div class="test-card">
+        <div class="name">Paper 16</div>
+        <div class="meta">
+          <span>50 questions</span>
+          <span>50 min</span>
+        </div>
+        <a class="btn" href="paper 16.html">Start Test</a>
+      </div>
+
+
+    </div>
+
+    <div class="back-link">
+      <a class="btn secondary" href="../index.html">← Back to Home</a>
+    </div>
+  </div>
+</div>
+</body>
+</html>

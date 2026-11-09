@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Paper 3</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body {
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    background: linear-gradient(135deg, #4f46e5, #7c3aed 45%, #db2777);
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    color: #1e1b2e;
+  }
+  .app {
+    width: 100%;
+    max-width: 560px;
+    background: #ffffff;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    overflow: hidden;
+    min-height: 520px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .screen { display:none; flex-direction:column; flex:1; padding: 32px 28px; animation: fadeIn 0.35s ease; overflow-y:auto; }
+  .screen.active { display:flex; }
+  @keyframes fadeIn { from{opacity:0; transform:translateY(8px);} to{opacity:1; transform:translateY(0);} }
+
+  /* HOME */
+  #home { align-items:center; justify-content:center; text-align:center; }
+  #home h1 { font-size: 32px; background: linear-gradient(135deg,#7c3aed,#db2777); -webkit-background-clip:text; background-clip:text; color:transparent; margin-bottom: 6px; }
+  #home h2 { font-size: 17px; color:#4b5563; font-weight:600; margin-bottom: 22px; }
+  #home p { color:#6b7280; font-size:14px; margin-bottom: 26px; }
+  .btn {
+    background: linear-gradient(135deg,#7c3aed,#4f46e5);
+    color:white; border:none; padding: 13px 26px; border-radius: 12px;
+    font-size: 15px; font-weight:600; cursor:pointer; transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 6px 16px rgba(124,58,237,0.35);
+  }
+  .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(124,58,237,0.45); }
+  .btn:disabled { opacity:0.4; cursor:not-allowed; transform:none; box-shadow:none; }
+  .btn.secondary { background:#f3f4f6; color:#374151; box-shadow:none; margin-top:10px; }
+  .btn.secondary:hover { background:#e5e7eb; transform:none; }
+  .btn.small { padding: 9px 18px; font-size: 13px; }
+  .btn.submit { background: linear-gradient(135deg,#16a34a,#22c55e); }
+  .btn-row { display:flex; gap:10px; margin-top:6px; }
+  .stat { font-size:13px; color:#9ca3af; margin-top:18px; }
+
+  /* QUIZ */
+  #quiz .topbar { display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+  #quiz .qcount { font-size:13px; color:#6b7280; font-weight:600; }
+  #quiz .timerText { font-size:13px; color:#db2777; font-weight:700; }
+  .progress-track { height:6px; background:#e5e7eb; border-radius:6px; overflow:hidden; margin-bottom:8px; }
+  .progress-fill { height:100%; background: linear-gradient(90deg,#7c3aed,#db2777); transition: width 0.3s; }
+  .timer-track { height:5px; background:#f3f4f6; border-radius:6px; overflow:hidden; margin-bottom:22px; }
+  .timer-fill { height:100%; background:#f59e0b; transition: width 0.2s linear; }
+  #quiz .qtext { font-size: 19px; font-weight:700; color:#1f2937; margin-bottom: 20px; line-height:1.4; }
+  .options { display:flex; flex-direction:column; gap:10px; flex:1; }
+  .opt {
+    text-align:left; padding: 13px 16px; border-radius: 12px; border: 2px solid #e5e7eb;
+    background:#fafafa; font-size:14.5px; color:#374151; cursor:pointer; transition: all 0.15s;
+  }
+  .opt:hover { border-color:#c4b5fd; background:#f5f3ff; }
+  .opt.selected { border-color:#7c3aed; background:#f5f3ff; color:#5b21b6; font-weight:600; }
+  .opt.correct { border-color:#22c55e; background:#dcfce7; color:#166534; font-weight:600; }
+  .opt.wrong { border-color:#ef4444; background:#fee2e2; color:#991b1b; font-weight:600; }
+  .navrow { display:flex; justify-content:space-between; gap:10px; margin-top:18px; }
+  .navrow .btn { flex:1; }
+
+  /* RESULT */
+  #result { align-items:center; justify-content:center; text-align:center; }
+  .ring { width:140px; height:140px; border-radius:50%; display:flex; align-items:center; justify-content:center;
+    background: conic-gradient(#7c3aed calc(var(--pct)*1%), #e5e7eb 0); margin-bottom:20px; }
+  .ring-inner { width:112px; height:112px; border-radius:50%; background:white; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .ring-inner b { font-size:26px; color:#1f2937; }
+  .ring-inner span { font-size:11px; color:#9ca3af; }
+  #result h2 { font-size:22px; color:#1f2937; margin-bottom:4px; }
+  #result p { color:#6b7280; font-size:14px; margin-bottom: 22px; }
+
+  /* REVIEW */
+  #review .rev-item { border:1px solid #e5e7eb; border-radius:12px; padding:12px 14px; margin-bottom:10px; }
+  #review .rev-q { font-size:13.5px; font-weight:600; color:#1f2937; margin-bottom:6px; }
+  #review .rev-a { font-size:12.5px; margin-bottom:2px; }
+  #review .rev-a.ok { color:#16a34a; }
+  #review .rev-a.bad { color:#dc2626; }
+  #review .scroll { overflow-y:auto; flex:1; padding-right:4px; }
+  #review .scroll::-webkit-scrollbar { width:5px; }
+  #review .scroll::-webkit-scrollbar-thumb { background:#d1d5db; border-radius:4px; }
+
+  /* ===== RESPONSIVE: small phones ===== */
+  @media (max-width: 420px) {
+    body { padding: 14px; }
+    .app {
+      max-width: 100%;
+      min-height: 0;
+      max-height: 92vh;
+      max-height: 92dvh;
+      border-radius: 18px;
+    }
+    .screen { padding: 22px 18px; }
+    #home h1 { font-size: 26px; }
+    #home h2 { font-size: 16px; margin-bottom: 4px; }
+    .btn { padding: 12px 20px; font-size: 14px; }
+    #quiz .qtext { font-size: 16.5px; margin-bottom: 14px; }
+    .opt { padding: 11px 13px; font-size: 13.5px; }
+    .ring { width: 110px; height: 110px; }
+    .ring-inner { width: 88px; height: 88px; }
+    .ring-inner b { font-size: 21px; }
+    #result h2 { font-size: 19px; }
+    .navrow { gap: 8px; }
+    .navrow .btn { padding: 11px 10px; font-size: 13px; }
+  }
+
+  /* ===== RESPONSIVE: larger desktop screens ===== */
+  @media (min-width: 900px) {
+    .app { max-width: 620px; }
+    #quiz .qtext { font-size: 21px; }
+    .opt { padding: 15px 18px; font-size: 15.5px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- HOME -->
+  <div id="home" class="screen active">
+    <h1>🧠 Hi-Tech Computer </h1>
+    <h2>Mix Lesson</h2>
+    <h3>Paper 3</h3>
+    <button class="btn" id="startBtn"style="margin-top: 10px;">Start Test</button>
+    <p class="stat">50 questions • 50 min total</p>
+  </div>
+
+  <!-- QUIZ -->
+  <div id="quiz" class="screen">
+    <div class="topbar">
+      <span class="qcount" id="qCount">Question 1/5</span>
+      <span class="timerText" id="timerText">05:00</span>
+    </div>
+    <div class="progress-track"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="timer-track"><div class="timer-fill" id="timerFill"></div></div>
+    <div class="qtext" id="qText"></div>
+    <div class="options" id="optionsBox"></div>
+    <div class="navrow">
+      <button class="btn secondary" id="prevBtn">← Previous</button>
+      <button class="btn" id="nextBtn">Next →</button>
+    </div>
+    <button class="btn submit" id="submitBtn" style="margin-top:10px;">Submit Test</button>
+  </div>
+
+  <!-- RESULT -->
+  <div id="result" class="screen">
+    <div class="ring" id="ring"><div class="ring-inner"><b id="scoreBig"></b><span>SCORE</span></div></div>
+    <h2 id="resultTitle"></h2>
+    <p id="resultSub"></p>
+    <button class="btn" id="reviewBtn">Review Answers</button>
+  </div>
+
+  <!-- REVIEW -->
+  <div id="review" class="screen">
+    <h3 style="font-size:15px; color:#1f2937; margin-bottom:12px;">Answer Review</h3>
+    <div class="scroll" id="reviewList"></div>
+    <button class="btn secondary" id="backFromReview">Back to Result</button>
+  </div>
+
+</div>
+
+<script>
+const questions = [
+  { q:"1. Icon क्या है?", opts:["पिक्चर","एक डाटा","सॉफ्टवेयर","एक नियम","None"], correct:0 },
+  { q:"2. Computer का primary memory है-", opts:["PROM","RAM","ROM","a, b और c तीनों","None"], correct:3 },
+  { q:"3. निम्न में से कौन softcopy को hardcopy में बदलता है?", opts:["Speaker","Compiler","Printer","software","scanner"], correct:2 },
+  { q:"4. भारत का 'परम सुपर कंप्यूटर' कहाँ स्थित है?", opts:["केरल","मुंबई","पुणे","बैंगलोर","None"], correct:2 },
+  { q:"5. Notepad में Find कमांड किस मेनू में रहता है?", opts:["Format","Edit","File","View"], correct:1 },
+  { q:"6. इंटरनेट के आविष्कारक कौन माने जाते हैं?", opts:["डॉ विंट सर्फ","अजय पुरी","एनानोपा","चार्ल्स बैबेज","None"], correct:0 },
+  { q:"7. मेमोरी का उपयोग डाटा को -------- करने के लिए होता है।", opts:["प्रक्रिया","संग्रहित","a और b दोनों","केवल a","None"], correct:1 },
+  { q:"8. फाइल को एक से दूसरे जगह ले जाने के लिए किस कमांड का उपयोग किया जाता है?", opts:["copy","copy con","type","move","None"], correct:3 },
+  { q:"9. Windows7 …………………….. है।", opts:["application s/w","program","system s/w","all","None"], correct:2 },
+  { q:"10. निम्न में से कौन spreadsheet program है।", opts:["MS-Excel","MS-Word","Wordpad","MS-Access","None"], correct:0 },
+  { q:"11. MS-Excel में Row and column मिलकर क्या बनाते हैं?", opts:["Line","Column","Row","Cell","None"], correct:3 },
+  { q:"12. ClipArt किस मेनू में रहता है।", opts:["Reference","Insert","Pagelayout","Home","None"], correct:1 },
+  { q:"13. MS-word file का extension क्या होता है।", opts:[".doc",".docx",".xps",".mdb","None"], correct:1 },
+  { q:"14. Who is father of Modern computers?", opts:["Abraham Lincoln","James Gosling","Charles Babbage","Gordon E. Moore","None"], correct:2 },
+  { q:"15. Computer के Fourth generation की अवधि –", opts:["1975-95","1975-89","1975-2000","1965-75","None"], correct:1 },
+  { q:"16. VLSI technology किस पीढ़ी में उपयोग किया गया?", opts:["First","Second","Third","Fourth","None"], correct:3 },
+  { q:"17. कौन-सा मुख्य मेमोरी (Main Memory) के रूप में उपयोग किया जाता है?", opts:["CD","RAM","DVD","ROM","None"], correct:1 },
+  { q:"18. यदि computer से फाइल को हमेशा के लिए Delete करना हो तो कौन-सा बटन का उपयोग करेंगे?", opts:["DEL","SHIFT+DEL","CTRL+DEL","Backspace","None"], correct:1 },
+  { q:"19. MS-Excel में Hyperlink किस मेनू में रहता है?", opts:["View","Insert","Home","Pagelayout","None"], correct:1 },
+  { q:"20. किसी College के Computer Network को किस प्रकार का Network कहेंगे?", opts:["WAN","LAN","MAN","all a,b and c","None"], correct:1 },
+  { q:"21. लैपटॉप किस प्रकार का कंप्यूटर है?", opts:["Hybrid","Digital","Analog","Micro","None"], correct:1 },
+  { q:"22. Tablet क्या है?", opts:["software","Device","Output device","User","None"], correct:1 },
+  { q:"23. NIC का उपयोग किसे बनाने में होता है?", opts:["Program","Machine","Device","Software","None"], correct:2 },
+  { q:"24. Magnetic Disk का उपयोग कहाँ होता है?", opts:["Keyboard","Memory","SMPS","Printer","None"], correct:1 },
+  { q:"25. Recycle Bin से फाइल को वापस किस कमांड से लाते हैं?", opts:["Copy","Paste","Restore","Cut","None"], correct:2 },
+  { q:"26. एक Computer से दूसरे Computer में फाइल भेजने को क्या कहते हैं?", opts:["Transfer","Copy","Duplicate","Move","None"], correct:0 },
+  { q:"27. (101101)2 = (?)10", opts:["29","43","45","37","None"], correct:2 },
+  { q:"28. 'Rename' के लिए किस बटन का उपयोग करते हैं?", opts:["F1","F2","F3","F4","None"], correct:1 },
+  { q:"29. Multi User सुविधा किस प्रकार के Computer में उपलब्ध है?", opts:["Analog","Micro","Mini","Super","None"], correct:2 },
+  { q:"30. '@' लिखने के लिए कौन-सा बटन का उपयोग किया जाता है?", opts:["shift + 3","shift + 2","shift + 1","shift + 4","None"], correct:1 },
+  { q:"31. Keyboard से Power बटन दबाने पर क्या होता है?", opts:["Log off","Shut down","Sleep","Restart","None"], correct:1 },
+  { q:"32. निम्नलिखित में कौन-सा कथन सत्य है।", opts:["Computer बिना प्राथमिक मेमोरी के चल सकता है।","Computer बिना द्वितीय मेमोरी के चल सकता है।","Computer बिना द्वितीय मेमोरी के नहीं चल सकता है।","a और c","None"], correct:1 },
+  { q:"33. Computer System = ……………+ Software +……………", opts:["user, program","user, software","hardware, program","user, hardware","None"], correct:3 },
+  { q:"34. Ms-word में spelling and grammar कहाँ से सही करते हैं?", opts:["Reference","Home","Review","View"], correct:2 },
+  { q:"35. Computer में समय और तारीख चालू रखने के लिए कौन जिम्मेवार है।", opts:["SMPS","Mouse","On board battery","RAM"], correct:2 },
+  { q:"36. Computer डाटा को किसमें बदलता है?", opts:["Input","Information","software","program"], correct:1 },
+  { q:"37. MS-Excel में जोड़ने के लिए किस फॉर्मूला का उपयोग किया जाता है?", opts:["SQRT","COUNT","MAX","SUM"], correct:3 },
+  { q:"38. MS-power point का उपयोग किस लिए होता है?", opts:["Slide बनाने के लिए","page बनाने के लिए","sheet बनाने के लिए","image बनाने के लिए"], correct:0 },
+  { q:"39. Hard Disk क्या है?", opts:["Primary memory","secondary memory","दोनों","इनमें से कोई नहीं"], correct:1 },
+  { q:"40. तीसरे पीढ़ी में कंप्यूटर को बनाने के लिए किसका उपयोग किया गया था?", opts:["IC","Transistor","Vacuum tube","micro processor"], correct:0 },
+  { q:"41. Tally क्या है?", opts:["Application s/w","system s/w","hardware","device"], correct:0 },
+  { q:"42. Computer के चालू करने की प्रक्रिया को क्या कहते हैं?", opts:["restart","booting","turn off","log off"], correct:1 },
+  { q:"43. Local Disk D में sun फोल्डर के भीतर एक honey.txt नाम की फाइल है। उसका पथ होगा –", opts:["D:\\honey.txt","D:sun:honey.txt","D:\\sun\\honey.txt","D:sun honey.txt"], correct:2 },
+  { q:"44. Computer की सेटिंग में परिवर्तन करने के लिए कहाँ जाते हैं?", opts:["Help","User accounts","Control panel","Documents"], correct:2 },
+  { q:"45. Google क्या है?", opts:["सर्च इंजन","वेब साइट","प्रोग्राम","इनमें से कोई नहीं"], correct:0 },
+  { q:"46. '.pptx' किस software की file extension है?", opts:["MS Word","MS Excel","MS PowerPoint","MS Access"], correct:2 },
+  { q:"47. CPU को cool रखने के लिए मुख्यतः किसका उपयोग होता है?", opts:["Fan / Heat Sink","Speaker","Mouse","Scanner"], correct:0 },
+  { q:"48. Ctrl + Z का कार्य क्या है?", opts:["Undo करना","Redo करना","Copy करना","Paste करना"], correct:0 },
+  { q:"49. Ctrl + c का कार्य क्या है?", opts:["Undo करना","Redo करना","Copy करना","Paste करना"], correct:2 },
+  { q:"50. Ctrl + v का कार्य क्या है?", opts:["Undo करना","Redo करना","Copy करना","Paste करना"], correct:3 },
+];
+
+const TOTAL_TIME = 3000; // total test time in seconds
+let current = 0, selected = [], timerInterval, timeLeft;
+
+function $(id){ return document.getElementById(id); }
+const screens = { home:$('home'), quiz:$('quiz'), result:$('result'), review:$('review') };
+function show(name){
+  Object.values(screens).forEach(s => s.classList.remove('active'));
+  screens[name].classList.add('active');
+}
+
+/* ---------- QUIZ FLOW ---------- */
+$('startBtn').addEventListener('click', startQuiz);
+
+function startQuiz(){
+  current = 0;
+  selected = new Array(questions.length).fill(-1);
+  timeLeft = TOTAL_TIME;
+  show('quiz');
+  renderQuestion();
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    timeLeft -= 0.2;
+    updateTimerDisplay();
+    if (timeLeft <= 0){ clearInterval(timerInterval); finishQuiz(); }
+  }, 200);
+}
+
+function updateTimerDisplay(){
+  const t = Math.max(0, timeLeft);
+  const mm = String(Math.floor(t/60)).padStart(2,'0');
+  const ss = String(Math.floor(t%60)).padStart(2,'0');
+  $('timerText').textContent = `${mm}:${ss}`;
+  $('timerFill').style.width = (t/TOTAL_TIME*100) + '%';
+}
+
+function renderQuestion(){
+  const item = questions[current];
+  $('qCount').textContent = `Question ${current+1}/${questions.length}`;
+  $('progressFill').style.width = ((current)/(questions.length-1 || 1)*100) + '%';
+  $('qText').textContent = item.q;
+
+  const box = $('optionsBox');
+  box.innerHTML = '';
+  item.opts.forEach((opt, i) => {
+    const b = document.createElement('button');
+    b.className = 'opt' + (selected[current] === i ? ' selected' : '');
+    b.textContent = opt;
+    b.addEventListener('click', () => {
+      selected[current] = i;
+      renderQuestion();
+    });
+    box.appendChild(b);
+  });
+
+  $('prevBtn').disabled = current === 0;
+  $('nextBtn').textContent = current === questions.length - 1 ? 'Next →' : 'Next →';
+  $('nextBtn').disabled = current === questions.length - 1;
+}
+
+$('prevBtn').addEventListener('click', () => { if (current > 0){ current--; renderQuestion(); } });
+$('nextBtn').addEventListener('click', () => { if (current < questions.length-1){ current++; renderQuestion(); } });
+$('submitBtn').addEventListener('click', () => {
+  showConfirm('Submit the test now? You won\'t be able to change answers after this.', finishQuiz);
+});
+
+function showConfirm(message, onYes){
+  const overlay = document.createElement('div');
+  overlay.style.cssText = 'position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:999; padding:20px;';
+  overlay.innerHTML = `
+    <div style="background:white; border-radius:16px; padding:24px; max-width:340px; width:100%; box-shadow:0 20px 50px rgba(0,0,0,0.3); text-align:center;">
+      <p style="font-size:14.5px; color:#1f2937; margin-bottom:18px; line-height:1.5;">${message}</p>
+      <div style="display:flex; gap:10px;">
+        <button id="confirmNo" class="btn secondary" style="flex:1;">Cancel</button>
+        <button id="confirmYes" class="btn submit" style="flex:1;">Submit</button>
+      </div>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+  overlay.querySelector('#confirmNo').addEventListener('click', () => overlay.remove());
+  overlay.querySelector('#confirmYes').addEventListener('click', () => { overlay.remove(); onYes(); });
+}
+
+function finishQuiz(){
+  clearInterval(timerInterval);
+  let score = 0;
+  questions.forEach((item, i) => { if (selected[i] === item.correct) score++; });
+  window._lastScore = score;
+
+  const pct = Math.round((score/questions.length)*100);
+  $('ring').style.setProperty('--pct', pct);
+  $('scoreBig').textContent = `${score}/${questions.length}`;
+  $('resultTitle').textContent = pct >= 80 ? 'Excellent! 🎉' : pct >= 50 ? 'Good Job! 👍' : 'Keep Practicing 💪';
+  $('resultSub').textContent = `You scored ${pct}% on this quiz.`;
+  show('result');
+}
+
+$('reviewBtn').addEventListener('click', () => {
+  const list = $('reviewList');
+  list.innerHTML = '';
+  questions.forEach((item, i) => {
+    const chosen = selected[i];
+    const ok = chosen === item.correct;
+    const chosenText = chosen >= 0 ? item.opts[chosen] : '(not answered)';
+    const div = document.createElement('div');
+    div.className = 'rev-item';
+    div.innerHTML = `
+      <div class="rev-q">${i+1}. ${item.q}</div>
+      <div class="rev-a ${ok ? 'ok' : 'bad'}">Your answer: ${chosenText}</div>
+      ${ok ? '' : `<div class="rev-a ok">Correct answer: ${item.opts[item.correct]}</div>`}
+    `;
+    list.appendChild(div);
+  });
+  show('review');
+});
+$('backFromReview').addEventListener('click', () => show('result'));
+</script>
+</body>
+</html>
